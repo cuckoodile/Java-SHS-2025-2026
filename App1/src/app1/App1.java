@@ -4,6 +4,8 @@
  */
 package app1;
 
+import java.util.Scanner;
+
 /*
     - OOP   (Object Oriented Programming)
     - 4 Fundamentals (Pilars)
@@ -22,6 +24,7 @@ package app1;
             - Parameters and Arguements
             - Make the class flexible or reusable
         > Getters and Setters
+        > Scanners
 
             Phone myPhone = new Phone();
             Phone myPhone2 = new Phone();
@@ -42,14 +45,14 @@ public class App1 {
      */
     public static void main(String[] args) {
 //      Class ObjName = new SameClass();
-        Phone myPhone = new Phone("IPhone", "De guzman", 10000.00);
-        Phone yourPhone = new Phone("Samsung", "Gutierrez", 12000.00);
+//        Phone myPhone = new Phone("IPhone", "De guzman", 10000.00);
+//        Phone yourPhone = new Phone("Samsung", "Gutierrez", 12000.00);
         
 //        myPhone.brand = "Oppo";
         
-        System.out.println(myPhone.getBrand());
-        myPhone.setBrand("Hwawei");
-        System.out.println(myPhone.getBrand());
+//        System.out.println(myPhone.getBrand());
+//        myPhone.setBrand("Hwawei");
+//        System.out.println(myPhone.getBrand());
 //        System.out.println(myPhone.owner);
 //        System.out.println(myPhone.price);
 //        
@@ -59,6 +62,30 @@ public class App1 {
         
 //        myPhone.openPhone();
         
+        /* 
+            Scanner methods:
+                - next(): Returns the next token as a String. 
+                - nextLine(): Advances the scanner past the current line and returns the input that was skipped (useful for reading entire lines, including spaces). 
+                - nextInt(): Returns the next token as an int. 
+                - nextDouble(): Returns the next token as a double. 
+                - nextBoolean(): Returns the next token as a boolean. 
+                - nextFloat(), nextLong(), nextShort(), nextByte(): Return the next token as their respective primitive types. 
+        */
+
+        Scanner sc = new Scanner(System.in);
+        
+        System.out.println("Enter phone brand: ");
+        String brand = sc.nextLine();
+        System.out.println("Enter phone owner: ");
+        String owner = sc.nextLine();
+        System.out.println("Enter phone price: ");
+        Double price = sc.nextDouble();
+        
+        Phone myPhone = new Phone(brand, owner, price);
+        
+        System.out.println(myPhone.getBrand());
+        System.out.println(myPhone.owner);
+        System.out.println(myPhone.price);
     }
 }
 
