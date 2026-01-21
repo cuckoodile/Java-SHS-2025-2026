@@ -91,6 +91,33 @@ public class App1 {
 
 
 
+/*
+    ACTIVITY 3
+        Create a class named "Bank", the class will have private attributes: accountName, accountPassword, and accountBalance.
+        The bank class will have functions as described below.
+        Each user will be an instance of the class, which value will be a user input using Scanner.
+
+    class Bank
+        Attributes
+                accName = str
+                accPass = str
+                balance = int
+
+        Functions
+                checkBalance -> int/str
+                        - check first for the user name and password
+                deposit -> str/void
+                        - ask for deposit amount
+                withdraw -> str/void
+                        - check first for the user name and password before asking for withdrawal amount
+                        - withdrawal amount cant be greater than the available balance
+                changePass -> str/void
+                        - ask for the current password first before asking for a new one
+
+
+*/
+
+
 
 
 
