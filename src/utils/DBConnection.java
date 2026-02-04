@@ -23,6 +23,7 @@ public class DBConnection {
 
     public static void initializeDatabase() {
         // MySQL/MariaDB syntax — fully supported
+        // DOWNLOAD MYSQL jar --> https://dev.mysql.com/downloads/connector/j/
 
         try (Connection con = getConnection();
              Statement stmt = con.createStatement()) {
