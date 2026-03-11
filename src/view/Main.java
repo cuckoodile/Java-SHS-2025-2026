@@ -13,6 +13,7 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTable;
 import java.sql.*;
+import java.util.ArrayList;
 
 import model.*;
 import utils.*;
@@ -22,7 +23,7 @@ import utils.*;
  * @author lhourde
  */
 public class Main extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Main.class.getName());
 
     /**
@@ -30,15 +31,17 @@ public class Main extends javax.swing.JFrame {
      */
     public Main() {
         initComponents();
-        
+
+        List<Product> products = Product.getAllProducts();
+
         initForm();
-        initTable();
+        initTable(products);
     }
-    
+
     final void initForm() {
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.setResizable(false);
-        
+
         // Change default JFrame icon
         try {
             Image icon = ImageIO.read(getClass().getResource("/assets/icon.jpg"));
@@ -47,11 +50,11 @@ public class Main extends javax.swing.JFrame {
             e.printStackTrace();
         }
     }
-    
-    final void initTable() {
+
+    final void initTable(List<Product> products) {
         DefaultTableModel productTable = (DefaultTableModel) jTable1.getModel();
         productTable.setRowCount(0);
-        
+
         // Table Design
         jTable1.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
@@ -59,52 +62,35 @@ public class Main extends javax.swing.JFrame {
                 resizeTableColumns();
             }
         });
-        
+
         // Table Populating
-        String sql = """
-                     SELECT * FROM products
-                     """;
-        
-        try (Connection con = DBConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery()) {
-            
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                String name = rs.getString("name");
-                Double price = rs.getDouble("price");
-                int stock = rs.getInt("stock");
-                
-                productTable.addRow(new Object[]{
-                    id,
-                    name,
-                    price,
-                    stock,
-                    new Button("Btn " + id)
-                });
-                
-                System.out.printf("Fetched: %d \t %s \t %.2f \t %d %n", id, name, price, stock);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        for (Product p : products) {
+//            System.out.printf("Product to be add: ID %d Name %s%n", p.getId(), p.getName());
+
+            productTable.addRow(new Object[]{
+                p.getId(),
+                p.getName(),
+                p.getPrice(),
+                p.getStock()
+            });
         }
+
     }
-    
+
     private void resizeTableColumns() {
+        int columnCount = jTable1.getColumnCount();
+        int tableWidth = jTable1.getWidth();
 
-    int columnCount = jTable1.getColumnCount();
-    int tableWidth = jTable1.getWidth();
+        int fixedWidth = 60;
+        int remainingWidth = tableWidth - fixedWidth;
 
-    int fixedWidth = 60;
-    int remainingWidth = tableWidth - fixedWidth;
+        int widthPerColumn = remainingWidth / (columnCount - 1);
 
-    int widthPerColumn = remainingWidth / (columnCount - 1);
+        for (int i = 1; i < columnCount; i++) {
+            jTable1.getColumnModel().getColumn(i).setPreferredWidth(widthPerColumn);
+        }
 
-    for (int i = 1; i < columnCount; i++) {
-        jTable1.getColumnModel().getColumn(i).setPreferredWidth(widthPerColumn);
     }
-
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -118,10 +104,10 @@ public class Main extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
+        jPanel2 = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Tindahan ni Frieren");
-        setPreferredSize(new java.awt.Dimension(1000, 800));
 
         jPanel1.setBackground(new java.awt.Color(4, 37, 76));
         jPanel1.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -131,14 +117,14 @@ public class Main extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Name", "Price", "Stock", "Action"
+                "ID", "Name", "Price", "Stock"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Object.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Double.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true
+                false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -149,23 +135,45 @@ public class Main extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.setColumnSelectionAllowed(true);
+        jTable1.setMaximumSize(new java.awt.Dimension(2000, 2000));
+        jTable1.setMinimumSize(new java.awt.Dimension(500, 200));
+        jTable1.setPreferredSize(new java.awt.Dimension(500, 200));
+        jTable1.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(jTable1);
+        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+
+        jPanel2.setMaximumSize(new java.awt.Dimension(180, 32767));
+        jPanel2.setMinimumSize(new java.awt.Dimension(180, 100));
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 238, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 800, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 988, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 750, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(96, 96, 96)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 698, Short.MAX_VALUE)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
+            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -210,6 +218,7 @@ public class Main extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
