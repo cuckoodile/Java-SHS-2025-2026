@@ -2,37 +2,30 @@ package game.pkg1;
 
 import java.awt.*;
 import java.awt.event.*;
+//import java.util.*;
+import javax.swing.*;
+
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
 
 /**
  *
  * @author Ian Sube
-  
-  1. Character movements
-	- Horizontal 
-		- Left {a || A || Left Arrow}
-		- Right {d || D || Right Arrow}
-	- Vertical
-		- Jump (Up) {Space}
-		- Fast fall (Only if mid air) {s || S}
-2. Physics
-	- Gravity
-	- Velocity
-	- Collisions
-		- Collision Event 1: Platform to Character
-		- COllision Event 2: Character to Food
-                
+ *
+ * 1. Character movements - Horizontal - Left {a || A || Left Arrow} - Right {d
+ * || D || Right Arrow} - Vertical - Jump (Up) {Space} - Fast fall (Only if mid
+ * air) {s || S} 2. Physics - Gravity - Velocity - Collisions - Collision Event
+ * 1: Platform to Character - COllision Event 2: Character to Food
+ *
  */
 public class Form extends javax.swing.JFrame implements KeyListener {
 
     // === MOVEMENT VARIABLES ===
     private int playerX;    // Character Horizontal Postion
     private int playerY;    // Character Vertical Position
-    
+
     // Starting position
-    private final int originalPlayerY;  
+    private final int originalPlayerY;
     private final int originalPlayerX;
 
     private int vy = 0; // Vertical Velocity
@@ -43,7 +36,7 @@ public class Form extends javax.swing.JFrame implements KeyListener {
     private boolean onGround = false;   // Usually held on true
 
     private final int playerSpeed = 4;
-    private final int gravity = 1;         // Strength of gravity
+    private final int gravity = 3;         // Strength of gravity
     private final int jumpStrength = -20;  // How powerful the jump is
     private final int fastFall = 5;        // Extra speed when holding S in air
 
@@ -62,13 +55,12 @@ public class Form extends javax.swing.JFrame implements KeyListener {
         // Character Position Setup
         playerX = playerLabel.getX();
         playerY = playerLabel.getY();
-        
+
         /*
         playerX and playerY only change when:
             1. A movement key was pressed
             2. Due to gravity
-        */
-        
+         */
         originalPlayerX = playerLabel.getX();
         originalPlayerY = playerLabel.getY();
 
@@ -91,22 +83,26 @@ public class Form extends javax.swing.JFrame implements KeyListener {
 
         // Timer for FPS Setup
         gameTimer = new Timer(16, e -> updateMovement());   // 16ms ≈ 60 FPS
-            // time in ms, event or function (what to do when the time ends)
+        // time in ms, event or function (what to do when the time ends)
         gameTimer.start();
     }
 
     private void updateMovement() {
-        // 1. Horizontal Movement (A / D)
-        if (leftPressed) {
+        // 1. Horizontal Movement (A || <- / D || ->)
+        if (leftPressed) {  // true
+//            System.out.println("Left is Pressed");
             playerX -= playerSpeed;
         }
-        if (rightPressed) {
+        if (rightPressed) { // true
+//            System.out.println("Right is Pressed");
             playerX += playerSpeed;
         }
+
         // Keep player inside screen horizontally
         if (playerX < 0) {
             playerX = 0;
         }
+
         if (playerX > gamePanel.getWidth() - playerLabel.getWidth()) {
             playerX = gamePanel.getWidth() - playerLabel.getWidth();
         }
@@ -124,7 +120,8 @@ public class Form extends javax.swing.JFrame implements KeyListener {
        
         > Because this line runs 60 times per second, gravity is constantly pushing vy to-
         become more positive → which makes the character fall faster and faster.
-         */
+        */
+        
         if (downPressed && !onGround) {
             vy += fastFall;
         }
@@ -132,6 +129,12 @@ public class Form extends javax.swing.JFrame implements KeyListener {
         playerY += vy;
 
         // 3. ADVANCED COLLISION WITH ALL PLATFORMS (Separate X and Y resolution)
+        
+        /*
+        1. Top collision
+        2. Bottom collision
+        3. Horizontal collision (Left and Right side)
+        */
         onGround = false;
 
         Rectangle playerRect = new Rectangle(playerX, playerY,
@@ -154,6 +157,8 @@ public class Form extends javax.swing.JFrame implements KeyListener {
             }
         }
 
+//        =========== STOP HERE ============
+        
         // Update playerRect after vertical correction
         playerRect = new Rectangle(playerX, playerY,
                 playerLabel.getWidth(), playerLabel.getHeight());
@@ -180,23 +185,23 @@ public class Form extends javax.swing.JFrame implements KeyListener {
 
         // 4. Update the yellow box position on screen
         playerLabel.setLocation(playerX, playerY);
-        
+
         // 5. Reward/Finish Line
         Rectangle rewardRect = rewardLabel.getBounds();
         if (playerRect.intersects(rewardRect)) {
             gameTimer.stop();   // Pause the game while showing message
 
             JOptionPane.showMessageDialog(this,
-                "CONGRATULATIONS! \n\nYou reached the gold reward!\n\nThe game will now reset.",
-                "You Win!",
-                JOptionPane.INFORMATION_MESSAGE);
+                    "CONGRATULATIONS! \n\nYou reached the gold reward!\n\nThe game will now reset.",
+                    "You Win!",
+                    JOptionPane.INFORMATION_MESSAGE);
 
             resetGame();
             resetKeyStates();
             gameTimer.start();
         }
     }
-    
+
     private void resetGame() {
         playerX = originalPlayerX;
         playerY = originalPlayerY;
@@ -204,7 +209,7 @@ public class Form extends javax.swing.JFrame implements KeyListener {
         onGround = false;
         playerLabel.setLocation(playerX, playerY);
     }
-    
+
     private void resetKeyStates() {
         leftPressed = false;
         rightPressed = false;
@@ -289,7 +294,7 @@ public class Form extends javax.swing.JFrame implements KeyListener {
         playerLabel.setMinimumSize(new java.awt.Dimension(40, 40));
         playerLabel.setOpaque(true);
         playerLabel.setPreferredSize(new java.awt.Dimension(40, 40));
-        gamePanel.add(playerLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 490, 50, 46));
+        gamePanel.add(playerLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 470, 50, 46));
 
         groundPlatform.setBackground(new java.awt.Color(51, 255, 0));
         groundPlatform.setText("Floor Platform");
@@ -349,7 +354,9 @@ public class Form extends javax.swing.JFrame implements KeyListener {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(gamePanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(gamePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 6, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
